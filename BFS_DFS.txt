@@ -1,0 +1,182 @@
+/*
+#include<iostream>
+#include<omp.h>
+
+using namespace std;
+
+void bfs(int n, int **graph, int start){
+
+    int *v = new int[n];
+    int *q = new int[n];
+
+    for(int i=0;i<n;i++){
+        v[i]=0;
+    }
+
+    int f=0;
+    int r=0;
+
+    q[r++]=start;
+    v[start]=1;
+
+    while(f<r){
+
+        int cur=q[f++];
+        cout<<cur<<" ";
+
+        #pragma omp parallel for
+        for(int i=0;i<n;i++){
+
+            if(graph[cur][i]==1 && v[i]==0){
+
+                #pragma omp critical
+                {
+                    if(v[i]==0){
+
+                        v[i]=1;
+                        q[r++]=i;
+
+                    }
+                }
+            }
+        }
+    }
+
+    delete[] v;
+    delete[] q;
+}
+
+int main(){
+
+    int n;
+
+    cout<<"Enter number of vertices: ";
+    cin>>n;
+
+    int **graph = new int*[n];
+
+    for(int i=0;i<n;i++){
+        graph[i]=new int[n];
+    }
+
+    cout<<"Enter adjacency matrix:\n";
+
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            cin>>graph[i][j];
+        }
+    }
+
+    int start;
+
+    cout<<"Enter starting vertex: ";
+    cin>>start;
+
+    bfs(n,graph,start);
+
+    for(int i=0;i<n;i++){
+        delete[] graph[i];
+    }
+
+    delete[] graph;
+
+    return 0;
+}
+*/
+
+
+
+
+
+
+
+/*
+
+
+
+#include <iostream>
+#include <omp.h>
+
+using namespace std;
+
+void dfs(int node, int n, int **graph, int visited[]) {
+
+    cout << node << " ";
+    visited[node] = 1;
+
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++) {
+
+        if (graph[node][i] == 1) {
+
+            int shouldVisit = 0;
+
+            #pragma omp critical
+            {
+                if (!visited[i]) {
+                    visited[i] = 1;
+                    shouldVisit = 1;
+                }
+            }
+
+            if (shouldVisit) {
+                dfs(i, n, graph, visited);
+            }
+        }
+    }
+}
+
+int main() {
+
+    int n;
+
+    cout << "Enter number of vertices: ";
+    cin >> n;
+
+    // Dynamic adjacency matrix
+    int **graph = new int*[n];
+
+    for (int i = 0; i < n; i++) {
+        graph[i] = new int[n];
+    }
+
+    cout << "Enter adjacency matrix:\n";
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> graph[i][j];
+        }
+    }
+
+    int start;
+
+    cout << "Enter starting vertex: ";
+    cin >> start;
+
+    int visited[n];
+
+    for (int i = 0; i < n; i++) {
+        visited[i] = 0;
+    }
+
+    cout << "DFS Traversal:\n";
+
+    dfs(start, n, graph, visited);
+
+    // Free memory
+    for (int i = 0; i < n; i++) {
+        delete[] graph[i];
+    }
+
+    delete[] graph;
+
+    return 0;
+}
+
+
+
+*/
+
+
+
+

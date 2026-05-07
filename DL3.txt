@@ -1,0 +1,137 @@
+# ===============================
+# 1. IMPORT LIBRARIES
+# ===============================
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+
+from tensorflow.keras.datasets import fashion_mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.utils import to_categorical
+
+from sklearn.metrics import classification_report, accuracy_score
+
+# ===============================
+# 2. LOAD DATASET
+# ===============================
+(x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
+
+# ===============================
+# 3. PREPROCESSING
+# ===============================
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+
+x_train = x_train.reshape(-1, 28, 28, 1)
+x_test = x_test.reshape(-1, 28, 28, 1)
+
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_test, 10)
+
+# ===============================
+# 4. MODEL BUILDING (CNN)
+# ===============================
+model = Sequential()
+
+model.add(Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1)))
+model.add(MaxPooling2D((2,2)))
+
+model.add(Conv2D(64, (3,3), activation='relu'))
+model.add(MaxPooling2D((2,2)))
+
+model.add(Flatten())
+
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.5))
+
+model.add(Dense(10, activation='softmax'))
+
+# ===============================
+# 5. COMPILE MODEL
+# ===============================
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+# ===============================
+# 6. TRAIN MODEL
+# ===============================
+history = model.fit(
+    x_train, y_train,
+    epochs=10,
+    batch_size=64,
+    validation_data=(x_test, y_test)
+)
+
+# ===============================
+# 7. EVALUATION
+# ===============================
+y_pred = model.predict(x_test)
+
+y_pred_classes = np.argmax(y_pred, axis=1)
+y_true = np.argmax(y_test, axis=1)
+
+print("\nACCURACY:", accuracy_score(y_true, y_pred_classes))
+
+print("\nCLASSIFICATION REPORT:\n")
+
+print(classification_report(
+    y_true,
+    y_pred_classes,
+    target_names=[
+        "Class 0 (T-shirt/top)",
+        "Class 1 (Trouser)",
+        "Class 2 (Pullover)",
+        "Class 3 (Dress)",
+        "Class 4 (Coat)",
+        "Class 5 (Sandal)",
+        "Class 6 (Shirt)",
+        "Class 7 (Sneaker)",
+        "Class 8 (Bag)",
+        "Class 9 (Ankle boot)"
+    ]
+))
+
+# ===============================
+# 8. ACCURACY + LOSS GRAPH
+# ===============================
+plt.figure(figsize=(12,5))
+
+# Accuracy
+plt.subplot(1,2,1)
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.title("Accuracy vs Epochs")
+plt.xlabel("Epochs")
+plt.ylabel("Accuracy")
+plt.legend()
+
+# Loss
+plt.subplot(1,2,2)
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.title("Loss vs Epochs")
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.legend()
+
+plt.show()
+
+# ===============================
+# 9. SAMPLE IMAGE VISUALIZATION
+# ===============================
+class_names = [
+    "T-shirt/top","Trouser","Pullover","Dress","Coat",
+    "Sandal","Shirt","Sneaker","Bag","Ankle boot"
+]
+
+plt.figure(figsize=(10,5))
+
+for i in range(10):
+    plt.subplot(2,5,i+1)
+    plt.imshow(x_train[i].reshape(28,28), cmap='gray')
+    plt.title(class_names[np.argmax(y_train[i])])
+    plt.axis('off')
+
+plt.show()
